@@ -9,38 +9,197 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignupRouteImport } from './routes/signup'
+import { Route as LoginRouteImport } from './routes/login'
+import { Route as ExperienceRouteImport } from './routes/experience'
+import { Route as AccountTypeRouteImport } from './routes/account-type'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppProfileRouteImport } from './routes/_app.profile'
+import { Route as AppPartnerRouteImport } from './routes/_app.partner'
+import { Route as AppHomeRouteImport } from './routes/_app.home'
+import { Route as AppCycleRouteImport } from './routes/_app.cycle'
+import { Route as AppCheckinRouteImport } from './routes/_app.checkin'
 
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const LoginRoute = LoginRouteImport.update({
+  id: '/login',
+  path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ExperienceRoute = ExperienceRouteImport.update({
+  id: '/experience',
+  path: '/experience',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AccountTypeRoute = AccountTypeRouteImport.update({
+  id: '/account-type',
+  path: '/account-type',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPartnerRoute = AppPartnerRouteImport.update({
+  id: '/partner',
+  path: '/partner',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppHomeRoute = AppHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCycleRoute = AppCycleRouteImport.update({
+  id: '/cycle',
+  path: '/cycle',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCheckinRoute = AppCheckinRouteImport.update({
+  id: '/checkin',
+  path: '/checkin',
+  getParentRoute: () => AppRoute,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/account-type': typeof AccountTypeRoute
+  '/experience': typeof ExperienceRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/checkin': typeof AppCheckinRoute
+  '/cycle': typeof AppCycleRoute
+  '/home': typeof AppHomeRoute
+  '/partner': typeof AppPartnerRoute
+  '/profile': typeof AppProfileRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/account-type': typeof AccountTypeRoute
+  '/experience': typeof ExperienceRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/checkin': typeof AppCheckinRoute
+  '/cycle': typeof AppCycleRoute
+  '/home': typeof AppHomeRoute
+  '/partner': typeof AppPartnerRoute
+  '/profile': typeof AppProfileRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
+  '/account-type': typeof AccountTypeRoute
+  '/experience': typeof ExperienceRoute
+  '/login': typeof LoginRoute
+  '/signup': typeof SignupRoute
+  '/_app/checkin': typeof AppCheckinRoute
+  '/_app/cycle': typeof AppCycleRoute
+  '/_app/home': typeof AppHomeRoute
+  '/_app/partner': typeof AppPartnerRoute
+  '/_app/profile': typeof AppProfileRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/account-type'
+    | '/experience'
+    | '/login'
+    | '/signup'
+    | '/checkin'
+    | '/cycle'
+    | '/home'
+    | '/partner'
+    | '/profile'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/account-type'
+    | '/experience'
+    | '/login'
+    | '/signup'
+    | '/checkin'
+    | '/cycle'
+    | '/home'
+    | '/partner'
+    | '/profile'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/account-type'
+    | '/experience'
+    | '/login'
+    | '/signup'
+    | '/_app/checkin'
+    | '/_app/cycle'
+    | '/_app/home'
+    | '/_app/partner'
+    | '/_app/profile'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
+  AccountTypeRoute: typeof AccountTypeRoute
+  ExperienceRoute: typeof ExperienceRoute
+  LoginRoute: typeof LoginRoute
+  SignupRoute: typeof SignupRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/login': {
+      id: '/login'
+      path: '/login'
+      fullPath: '/login'
+      preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/experience': {
+      id: '/experience'
+      path: '/experience'
+      fullPath: '/experience'
+      preLoaderRoute: typeof ExperienceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/account-type': {
+      id: '/account-type'
+      path: '/account-type'
+      fullPath: '/account-type'
+      preLoaderRoute: typeof AccountTypeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,22 +207,70 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/partner': {
+      id: '/_app/partner'
+      path: '/partner'
+      fullPath: '/partner'
+      preLoaderRoute: typeof AppPartnerRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/home': {
+      id: '/_app/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof AppHomeRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/cycle': {
+      id: '/_app/cycle'
+      path: '/cycle'
+      fullPath: '/cycle'
+      preLoaderRoute: typeof AppCycleRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/checkin': {
+      id: '/_app/checkin'
+      path: '/checkin'
+      fullPath: '/checkin'
+      preLoaderRoute: typeof AppCheckinRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppCheckinRoute: typeof AppCheckinRoute
+  AppCycleRoute: typeof AppCycleRoute
+  AppHomeRoute: typeof AppHomeRoute
+  AppPartnerRoute: typeof AppPartnerRoute
+  AppProfileRoute: typeof AppProfileRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppCheckinRoute: AppCheckinRoute,
+  AppCycleRoute: AppCycleRoute,
+  AppHomeRoute: AppHomeRoute,
+  AppPartnerRoute: AppPartnerRoute,
+  AppProfileRoute: AppProfileRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
+  AccountTypeRoute: AccountTypeRoute,
+  ExperienceRoute: ExperienceRoute,
+  LoginRoute: LoginRoute,
+  SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { startInstance } from './start.ts'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-    config: Awaited<ReturnType<typeof startInstance.getOptions>>
-  }
-}
