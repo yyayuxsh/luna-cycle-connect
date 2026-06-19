@@ -9,7 +9,8 @@ export const Route = createFileRoute("/_app/home")({
 });
 
 function HomePage() {
-  const user = useLunaUser();
+  const { user, loading } = useLunaUser();
+  if (loading) return null;
   if (!user) return <Navigate to="/" />;
   if (user.mode === "couple" || user.accountType === "partner") return <CoupleHome user={user} />;
   return <SoloHome user={user} />;
