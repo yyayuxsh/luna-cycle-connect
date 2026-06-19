@@ -9,9 +9,15 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as ExperienceRouteImport } from './routes/experience'
 import { Route as AccountTypeRouteImport } from './routes/account-type'
 import { Route as IndexRouteImport } from './routes/index'
 
+const ExperienceRoute = ExperienceRouteImport.update({
+  id: '/experience',
+  path: '/experience',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AccountTypeRoute = AccountTypeRouteImport.update({
   id: '/account-type',
   path: '/account-type',
@@ -26,31 +32,42 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account-type': typeof AccountTypeRoute
+  '/experience': typeof ExperienceRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account-type': typeof AccountTypeRoute
+  '/experience': typeof ExperienceRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/account-type': typeof AccountTypeRoute
+  '/experience': typeof ExperienceRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/account-type'
+  fullPaths: '/' | '/account-type' | '/experience'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/account-type'
-  id: '__root__' | '/' | '/account-type'
+  to: '/' | '/account-type' | '/experience'
+  id: '__root__' | '/' | '/account-type' | '/experience'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountTypeRoute: typeof AccountTypeRoute
+  ExperienceRoute: typeof ExperienceRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/experience': {
+      id: '/experience'
+      path: '/experience'
+      fullPath: '/experience'
+      preLoaderRoute: typeof ExperienceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/account-type': {
       id: '/account-type'
       path: '/account-type'
@@ -71,6 +88,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountTypeRoute: AccountTypeRoute,
+  ExperienceRoute: ExperienceRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
