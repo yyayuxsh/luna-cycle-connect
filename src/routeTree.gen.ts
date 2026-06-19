@@ -15,7 +15,11 @@ import { Route as ExperienceRouteImport } from './routes/experience'
 import { Route as AccountTypeRouteImport } from './routes/account-type'
 import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppProfileRouteImport } from './routes/_app.profile'
+import { Route as AppPartnerRouteImport } from './routes/_app.partner'
 import { Route as AppHomeRouteImport } from './routes/_app.home'
+import { Route as AppCycleRouteImport } from './routes/_app.cycle'
+import { Route as AppCheckinRouteImport } from './routes/_app.checkin'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -46,9 +50,29 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppProfileRoute = AppProfileRouteImport.update({
+  id: '/profile',
+  path: '/profile',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppPartnerRoute = AppPartnerRouteImport.update({
+  id: '/partner',
+  path: '/partner',
+  getParentRoute: () => AppRoute,
+} as any)
 const AppHomeRoute = AppHomeRouteImport.update({
   id: '/home',
   path: '/home',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCycleRoute = AppCycleRouteImport.update({
+  id: '/cycle',
+  path: '/cycle',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppCheckinRoute = AppCheckinRouteImport.update({
+  id: '/checkin',
+  path: '/checkin',
   getParentRoute: () => AppRoute,
 } as any)
 
@@ -58,7 +82,11 @@ export interface FileRoutesByFullPath {
   '/experience': typeof ExperienceRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/checkin': typeof AppCheckinRoute
+  '/cycle': typeof AppCycleRoute
   '/home': typeof AppHomeRoute
+  '/partner': typeof AppPartnerRoute
+  '/profile': typeof AppProfileRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -66,7 +94,11 @@ export interface FileRoutesByTo {
   '/experience': typeof ExperienceRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/checkin': typeof AppCheckinRoute
+  '/cycle': typeof AppCycleRoute
   '/home': typeof AppHomeRoute
+  '/partner': typeof AppPartnerRoute
+  '/profile': typeof AppProfileRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -76,7 +108,11 @@ export interface FileRoutesById {
   '/experience': typeof ExperienceRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/_app/checkin': typeof AppCheckinRoute
+  '/_app/cycle': typeof AppCycleRoute
   '/_app/home': typeof AppHomeRoute
+  '/_app/partner': typeof AppPartnerRoute
+  '/_app/profile': typeof AppProfileRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -86,9 +122,23 @@ export interface FileRouteTypes {
     | '/experience'
     | '/login'
     | '/signup'
+    | '/checkin'
+    | '/cycle'
     | '/home'
+    | '/partner'
+    | '/profile'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/account-type' | '/experience' | '/login' | '/signup' | '/home'
+  to:
+    | '/'
+    | '/account-type'
+    | '/experience'
+    | '/login'
+    | '/signup'
+    | '/checkin'
+    | '/cycle'
+    | '/home'
+    | '/partner'
+    | '/profile'
   id:
     | '__root__'
     | '/'
@@ -97,7 +147,11 @@ export interface FileRouteTypes {
     | '/experience'
     | '/login'
     | '/signup'
+    | '/_app/checkin'
+    | '/_app/cycle'
     | '/_app/home'
+    | '/_app/partner'
+    | '/_app/profile'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -153,6 +207,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/profile': {
+      id: '/_app/profile'
+      path: '/profile'
+      fullPath: '/profile'
+      preLoaderRoute: typeof AppProfileRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/partner': {
+      id: '/_app/partner'
+      path: '/partner'
+      fullPath: '/partner'
+      preLoaderRoute: typeof AppPartnerRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/_app/home': {
       id: '/_app/home'
       path: '/home'
@@ -160,15 +228,37 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AppHomeRouteImport
       parentRoute: typeof AppRoute
     }
+    '/_app/cycle': {
+      id: '/_app/cycle'
+      path: '/cycle'
+      fullPath: '/cycle'
+      preLoaderRoute: typeof AppCycleRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/checkin': {
+      id: '/_app/checkin'
+      path: '/checkin'
+      fullPath: '/checkin'
+      preLoaderRoute: typeof AppCheckinRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
 interface AppRouteChildren {
+  AppCheckinRoute: typeof AppCheckinRoute
+  AppCycleRoute: typeof AppCycleRoute
   AppHomeRoute: typeof AppHomeRoute
+  AppPartnerRoute: typeof AppPartnerRoute
+  AppProfileRoute: typeof AppProfileRoute
 }
 
 const AppRouteChildren: AppRouteChildren = {
+  AppCheckinRoute: AppCheckinRoute,
+  AppCycleRoute: AppCycleRoute,
   AppHomeRoute: AppHomeRoute,
+  AppPartnerRoute: AppPartnerRoute,
+  AppProfileRoute: AppProfileRoute,
 }
 
 const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
