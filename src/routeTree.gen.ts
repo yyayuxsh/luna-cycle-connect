@@ -13,7 +13,9 @@ import { Route as SignupRouteImport } from './routes/signup'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ExperienceRouteImport } from './routes/experience'
 import { Route as AccountTypeRouteImport } from './routes/account-type'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppHomeRouteImport } from './routes/_app.home'
 
 const SignupRoute = SignupRouteImport.update({
   id: '/signup',
@@ -35,10 +37,19 @@ const AccountTypeRoute = AccountTypeRouteImport.update({
   path: '/account-type',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
+} as any)
+const AppHomeRoute = AppHomeRouteImport.update({
+  id: '/home',
+  path: '/home',
+  getParentRoute: () => AppRoute,
 } as any)
 
 export interface FileRoutesByFullPath {
@@ -47,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/experience': typeof ExperienceRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/home': typeof AppHomeRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -54,25 +66,43 @@ export interface FileRoutesByTo {
   '/experience': typeof ExperienceRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/home': typeof AppHomeRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
   '/account-type': typeof AccountTypeRoute
   '/experience': typeof ExperienceRoute
   '/login': typeof LoginRoute
   '/signup': typeof SignupRoute
+  '/_app/home': typeof AppHomeRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/account-type' | '/experience' | '/login' | '/signup'
+  fullPaths:
+    | '/'
+    | '/account-type'
+    | '/experience'
+    | '/login'
+    | '/signup'
+    | '/home'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/account-type' | '/experience' | '/login' | '/signup'
-  id: '__root__' | '/' | '/account-type' | '/experience' | '/login' | '/signup'
+  to: '/' | '/account-type' | '/experience' | '/login' | '/signup' | '/home'
+  id:
+    | '__root__'
+    | '/'
+    | '/_app'
+    | '/account-type'
+    | '/experience'
+    | '/login'
+    | '/signup'
+    | '/_app/home'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
   AccountTypeRoute: typeof AccountTypeRoute
   ExperienceRoute: typeof ExperienceRoute
   LoginRoute: typeof LoginRoute
@@ -109,6 +139,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AccountTypeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -116,11 +153,29 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/home': {
+      id: '/_app/home'
+      path: '/home'
+      fullPath: '/home'
+      preLoaderRoute: typeof AppHomeRouteImport
+      parentRoute: typeof AppRoute
+    }
   }
 }
 
+interface AppRouteChildren {
+  AppHomeRoute: typeof AppHomeRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppHomeRoute: AppHomeRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
   AccountTypeRoute: AccountTypeRoute,
   ExperienceRoute: ExperienceRoute,
   LoginRoute: LoginRoute,
