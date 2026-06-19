@@ -9,10 +9,16 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ExperienceRouteImport } from './routes/experience'
 import { Route as AccountTypeRouteImport } from './routes/account-type'
 import { Route as IndexRouteImport } from './routes/index'
 
+const SignupRoute = SignupRouteImport.update({
+  id: '/signup',
+  path: '/signup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ExperienceRoute = ExperienceRouteImport.update({
   id: '/experience',
   path: '/experience',
@@ -33,34 +39,45 @@ export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/account-type': typeof AccountTypeRoute
   '/experience': typeof ExperienceRoute
+  '/signup': typeof SignupRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/account-type': typeof AccountTypeRoute
   '/experience': typeof ExperienceRoute
+  '/signup': typeof SignupRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/account-type': typeof AccountTypeRoute
   '/experience': typeof ExperienceRoute
+  '/signup': typeof SignupRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/account-type' | '/experience'
+  fullPaths: '/' | '/account-type' | '/experience' | '/signup'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/account-type' | '/experience'
-  id: '__root__' | '/' | '/account-type' | '/experience'
+  to: '/' | '/account-type' | '/experience' | '/signup'
+  id: '__root__' | '/' | '/account-type' | '/experience' | '/signup'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AccountTypeRoute: typeof AccountTypeRoute
   ExperienceRoute: typeof ExperienceRoute
+  SignupRoute: typeof SignupRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/signup': {
+      id: '/signup'
+      path: '/signup'
+      fullPath: '/signup'
+      preLoaderRoute: typeof SignupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/experience': {
       id: '/experience'
       path: '/experience'
@@ -89,6 +106,7 @@ const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AccountTypeRoute: AccountTypeRoute,
   ExperienceRoute: ExperienceRoute,
+  SignupRoute: SignupRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
