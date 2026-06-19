@@ -3,7 +3,9 @@ import { ArrowLeft } from "lucide-react";
 import { useState } from "react";
 import { PhoneFrame } from "@/components/luna/PhoneFrame";
 import { LunaLogo } from "@/components/luna/LunaLogo";
-import { clearDraft, getDraft, setUser } from "@/lib/luna-store";
+import { clearDraft, getDraft } from "@/lib/luna-store";
+import { supabase } from "@/integrations/supabase/client";
+import { lovable } from "@/integrations/lovable";
 
 export const Route = createFileRoute("/signup")({
   head: () => ({ meta: [{ title: "Create your Luna account" }] }),
@@ -14,22 +16,49 @@ function SignupPage() {
   const navigate = useNavigate();
   const [form, setForm] = useState({ name: "", email: "", password: "", confirm: "" });
   const [error, setError] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
-  const onSubmit = (e: React.FormEvent) => {
+  const onSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
     if (!form.name || !form.email) return setError("Please complete all fields.");
     if (form.password.length < 6) return setError("Password must be at least 6 characters.");
     if (form.password !== form.confirm) return setError("Passwords do not match.");
     const draft = getDraft();
-    setUser({
-      name: form.name,
+    const accountType = draft.accountType ?? "woman";
+    const mode = draft.mode ?? (accountType === "partner" ? "couple" : "solo");
+    setBusy(true);
+    const { error: err } = await supabase.auth.signUp({
       email: form.email,
-      accountType: draft.accountType ?? "woman",
-      mode: draft.mode ?? (draft.accountType === "partner" ? "couple" : "solo"),
-      partnerName: draft.accountType === "partner" ? undefined : "Alex",
-      togetherSince: new Date(Date.now() - 1000 * 60 * 60 * 24 * 412).toISOString(),
+      password: form.password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/home`,
+        data: {
+          display_name: form.name,
+          account_type: accountType,
+          experience_mode: mode,
+        },
+      },
     });
+    setBusy(false);
+    if (err) {
+      setError(err.message);
+      return;
+    }
     clearDraft();
+    navigate({ to: "/home" });
+  };
+
+  const onGoogle = async () => {
+    setError(null);
+    const result = await lovable.auth.signInWithOAuth("google", {
+      redirect_uri: `${window.location.origin}/home`,
+    });
+    if (result.error) {
+      setError(result.error.message ?? "Google sign-in failed.");
+      return;
+    }
+    if (result.redirected) return;
     navigate({ to: "/home" });
   };
 
@@ -64,10 +93,23 @@ function SignupPage() {
 
           <button
             type="submit"
+            disabled={busy}
             className="mt-2 inline-flex h-14 items-center justify-center rounded-2xl text-base font-semibold text-primary-foreground shadow-[var(--shadow-elevated)] transition-transform active:scale-[0.98]"
             style={{ background: "var(--gradient-luna)" }}
           >
-            Create account
+            {busy ? "Creating…" : "Create account"}
+          </button>
+
+          <div className="my-2 flex items-center gap-3 text-xs uppercase tracking-wider text-muted-foreground">
+            <span className="h-px flex-1 bg-border" /> or <span className="h-px flex-1 bg-border" />
+          </div>
+
+          <button
+            type="button"
+            onClick={onGoogle}
+            className="inline-flex h-12 items-center justify-center gap-2 rounded-2xl border border-border bg-card text-sm font-semibold text-foreground transition-colors hover:bg-muted"
+          >
+            Continue with Google
           </button>
 
           <p className="mt-2 text-center text-sm text-muted-foreground">

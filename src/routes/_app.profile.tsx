@@ -1,7 +1,7 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, Navigate, useNavigate } from "@tanstack/react-router";
 import { LogOut, Settings, Shield, User } from "lucide-react";
 import { LunaCard, CardLabel } from "@/components/luna/Card";
-import { setUser, useLunaUser } from "@/lib/luna-store";
+import { signOut, useLunaUser } from "@/lib/luna-store";
 
 export const Route = createFileRoute("/_app/profile")({
   head: () => ({ meta: [{ title: "Profile — Luna" }] }),
@@ -9,15 +9,16 @@ export const Route = createFileRoute("/_app/profile")({
 });
 
 function ProfilePage() {
-  const user = useLunaUser();
+  const { user, loading } = useLunaUser();
   const navigate = useNavigate();
 
-  const logout = () => {
-    setUser(null);
+  const logout = async () => {
+    await signOut();
     navigate({ to: "/" });
   };
 
-  if (!user) return null;
+  if (loading) return null;
+  if (!user) return <Navigate to="/" />;
 
   return (
     <div className="flex flex-col gap-5 px-6 pb-28 pt-10">
