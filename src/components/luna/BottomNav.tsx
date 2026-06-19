@@ -2,13 +2,20 @@ import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Calendar, Plus, Heart, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 
-const items = [
+type NavItem = {
+  to: "/home" | "/cycle" | "/checkin" | "/partner" | "/profile";
+  label: string;
+  icon: typeof Home;
+  primary?: boolean;
+};
+
+const items: NavItem[] = [
   { to: "/home", label: "Home", icon: Home },
   { to: "/cycle", label: "Cycle", icon: Calendar },
   { to: "/checkin", label: "Check-In", icon: Plus, primary: true },
   { to: "/partner", label: "Partner", icon: Heart },
   { to: "/profile", label: "Profile", icon: User },
-] as const;
+];
 
 export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
