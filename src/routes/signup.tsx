@@ -28,7 +28,7 @@ function SignupPage() {
     const accountType = draft.accountType ?? "woman";
     const mode = draft.mode ?? (accountType === "partner" ? "couple" : "solo");
     setBusy(true);
-    const { error: err } = await supabase.auth.signUp({
+    const { data, error: err } = await supabase.auth.signUp({
       email: form.email,
       password: form.password,
       options: {
@@ -43,6 +43,10 @@ function SignupPage() {
     setBusy(false);
     if (err) {
       setError(err.message);
+      return;
+    }
+    if (!data.session) {
+      setError("Account created. Please check your email to confirm before signing in.");
       return;
     }
     clearDraft();
