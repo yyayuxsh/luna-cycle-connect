@@ -168,8 +168,7 @@ function CyclePage() {
         <LunaCard>
           <CardLabel>Predictions</CardLabel>
           <p className="mt-2 text-sm text-muted-foreground">
-            Not enough data for predictions yet. Log at least one more
-            completed cycle to unlock predictions.
+            Log one more completed cycle to unlock predictions.
           </p>
         </LunaCard>
       )}
