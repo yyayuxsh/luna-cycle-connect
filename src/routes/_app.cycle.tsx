@@ -46,6 +46,17 @@ function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function PredictionStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl bg-muted/40 p-3">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </p>
+      <p className="mt-1 text-base font-semibold">{value}</p>
+    </div>
+  );
+}
+
 function CyclePage() {
   const [cycles, setCycles] = useState<CycleRow[]>([]);
   const [loading, setLoading] = useState(true);
