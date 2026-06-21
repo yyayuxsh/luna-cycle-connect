@@ -7,6 +7,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
+import { computePredictions, formatPredictionDate } from "@/lib/cycle-predictions";
 
 export const Route = createFileRoute("/_app/cycle")({
   head: () => ({ meta: [{ title: "Cycle — Luna" }] }),
@@ -45,6 +46,17 @@ function todayISO() {
   return new Date().toISOString().slice(0, 10);
 }
 
+function PredictionStat({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="rounded-2xl bg-muted/40 p-3">
+      <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">
+        {label}
+      </p>
+      <p className="mt-1 text-base font-semibold">{value}</p>
+    </div>
+  );
+}
+
 function CyclePage() {
   const [cycles, setCycles] = useState<CycleRow[]>([]);
   const [loading, setLoading] = useState(true);
@@ -80,6 +92,7 @@ function CyclePage() {
     if (!vals.length) return null;
     return Math.round(vals.reduce((a, b) => a + b, 0) / vals.length);
   }, [sortedAsc]);
+  const prediction = useMemo(() => computePredictions(cycles), [cycles]);
 
   const handleDelete = async (id: string) => {
     if (!confirm("Delete this cycle record?")) return;
@@ -140,6 +153,44 @@ function CyclePage() {
       >
         <Plus className="mr-2 h-5 w-5" /> Log Period
       </Button>
+
+      {prediction.hasData && (
+        <LunaCard>
+          <CardLabel>Predictions</CardLabel>
+          <div className="mt-3 grid grid-cols-2 gap-3">
+            <PredictionStat
+              label="Cycle Day"
+              value={
+                prediction.currentCycleDay
+                  ? `Day ${prediction.currentCycleDay}`
+                  : "—"
+              }
+            />
+            <PredictionStat
+              label="Phase"
+              value={prediction.currentPhase ?? "—"}
+            />
+            <PredictionStat
+              label="Next Period"
+              value={
+                prediction.nextPeriodDate
+                  ? formatPredictionDate(prediction.nextPeriodDate)
+                  : "—"
+              }
+            />
+            <PredictionStat
+              label="Days Remaining"
+              value={
+                prediction.daysUntilNextPeriod === null
+                  ? "—"
+                  : prediction.daysUntilNextPeriod >= 0
+                    ? `${prediction.daysUntilNextPeriod} days`
+                    : `${Math.abs(prediction.daysUntilNextPeriod)} days late`
+              }
+            />
+          </div>
+        </LunaCard>
+      )}
 
       <section>
         <div className="mb-3 flex items-center justify-between">
