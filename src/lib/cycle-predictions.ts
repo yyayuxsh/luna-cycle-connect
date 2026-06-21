@@ -11,8 +11,12 @@ export type CycleRow = {
 
 export type CyclePhase = "Menstrual" | "Follicular" | "Ovulation" | "Luteal";
 
+export type CycleStatus = "none" | "ongoing" | "insufficient" | "ready";
+
 export type CyclePrediction = {
   hasData: boolean;
+  status: CycleStatus;
+  canPredict: boolean;
   avgCycleLength: number;
   avgPeriodLength: number;
   lastPeriodStart: string | null;
@@ -41,6 +45,8 @@ export function computePredictions(cycles: CycleRow[]): CyclePrediction {
   if (!cycles.length) {
     return {
       hasData: false,
+      status: "none",
+      canPredict: false,
       avgCycleLength: DEFAULT_CYCLE_LENGTH,
       avgPeriodLength: DEFAULT_PERIOD_LENGTH,
       lastPeriodStart: null,
@@ -70,6 +76,45 @@ export function computePredictions(cycles: CycleRow[]): CyclePrediction {
     : DEFAULT_PERIOD_LENGTH;
 
   const last = sortedDesc[0];
+  const isOngoing = !last.period_end;
+  const canPredict = cycleLengths.length > 0 && !isOngoing;
+
+  if (isOngoing) {
+    const todayISO = toISO(new Date());
+    const dayIndex = diffDays(last.period_start, todayISO);
+    const currentCycleDay = dayIndex >= 0 ? dayIndex + 1 : null;
+    return {
+      hasData: true,
+      status: "ongoing",
+      canPredict: false,
+      avgCycleLength,
+      avgPeriodLength,
+      lastPeriodStart: last.period_start,
+      currentCycleDay,
+      currentPhase: "Menstrual",
+      nextPeriodDate: null,
+      daysUntilNextPeriod: null,
+    };
+  }
+
+  if (!canPredict) {
+    const todayISO = toISO(new Date());
+    const dayIndex = diffDays(last.period_start, todayISO);
+    const currentCycleDay = dayIndex >= 0 ? dayIndex + 1 : null;
+    return {
+      hasData: true,
+      status: "insufficient",
+      canPredict: false,
+      avgCycleLength,
+      avgPeriodLength,
+      lastPeriodStart: last.period_start,
+      currentCycleDay,
+      currentPhase: null,
+      nextPeriodDate: null,
+      daysUntilNextPeriod: null,
+    };
+  }
+
   const todayISO = toISO(new Date());
   const dayIndex = diffDays(last.period_start, todayISO); // 0 = day 1
   const currentCycleDay = dayIndex >= 0 ? dayIndex + 1 : null;
@@ -86,6 +131,8 @@ export function computePredictions(cycles: CycleRow[]): CyclePrediction {
 
   return {
     hasData: true,
+    status: "ready",
+    canPredict: true,
     avgCycleLength,
     avgPeriodLength,
     lastPeriodStart: last.period_start,

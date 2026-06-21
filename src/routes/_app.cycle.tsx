@@ -154,7 +154,27 @@ function CyclePage() {
         <Plus className="mr-2 h-5 w-5" /> Log Period
       </Button>
 
-      {prediction.hasData && (
+      {prediction.status === "ongoing" && (
+        <LunaCard>
+          <CardLabel>Current Status</CardLabel>
+          <p className="mt-2 text-base font-semibold">Period Ongoing</p>
+          <p className="mt-1 text-sm text-muted-foreground">
+            Predictions will be available once you log your period end date.
+          </p>
+        </LunaCard>
+      )}
+
+      {prediction.status === "insufficient" && (
+        <LunaCard>
+          <CardLabel>Predictions</CardLabel>
+          <p className="mt-2 text-sm text-muted-foreground">
+            Not enough data for predictions yet. Log at least one more
+            completed cycle to unlock predictions.
+          </p>
+        </LunaCard>
+      )}
+
+      {prediction.canPredict && (
         <LunaCard>
           <CardLabel>Predictions</CardLabel>
           <div className="mt-3 grid grid-cols-2 gap-3">
