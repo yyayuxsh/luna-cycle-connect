@@ -68,6 +68,8 @@ export function computePredictions(cycles: CycleRow[]): CyclePrediction {
     .map((c) => c.period_length)
     .filter((v): v is number => typeof v === "number" && v > 0);
 
+  const completedCount = sortedDesc.filter((c) => !!c.period_end).length;
+
   const avgCycleLength = cycleLengths.length
     ? Math.round(cycleLengths.reduce((a, b) => a + b, 0) / cycleLengths.length)
     : DEFAULT_CYCLE_LENGTH;
@@ -77,7 +79,11 @@ export function computePredictions(cycles: CycleRow[]): CyclePrediction {
 
   const last = sortedDesc[0];
   const isOngoing = !last.period_end;
-  const canPredict = cycleLengths.length > 0 && !isOngoing;
+  // Medically, you need at least two completed cycles (one full gap between
+  // two period starts where both periods have ended) before any cycle-length
+  // based prediction is meaningful.
+  const canPredict =
+    !isOngoing && completedCount >= 2 && cycleLengths.length > 0;
 
   if (isOngoing) {
     const todayISO = toISO(new Date());

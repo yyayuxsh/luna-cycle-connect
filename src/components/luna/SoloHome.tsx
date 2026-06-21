@@ -55,7 +55,7 @@ export function SoloHome({ user }: { user: LunaUser }) {
                 : canPredict && p?.currentCycleDay
                 ? `Day ${p.currentCycleDay} of ${p.avgCycleLength}`
                 : insufficient
-                ? "Not enough data for predictions yet"
+                ? "Log one more completed cycle to unlock predictions."
                 : "Log a period to see your phase"}
             </p>
           </div>
@@ -76,7 +76,7 @@ export function SoloHome({ user }: { user: LunaUser }) {
                 : isOngoing
                 ? "Period ongoing"
                 : insufficient
-                ? "Not enough data for predictions yet"
+                ? `Period length ${p?.avgPeriodLength} days`
                 : "No cycles logged"}
             </p>
           </div>
@@ -103,7 +103,7 @@ export function SoloHome({ user }: { user: LunaUser }) {
                 : isOngoing
                 ? "Available after period ends"
                 : insufficient
-                ? "Not enough data for predictions yet"
+                ? "Log one more completed cycle to unlock"
                 : "Log a period for predictions"}
             </p>
           </div>
@@ -123,6 +123,8 @@ export function SoloHome({ user }: { user: LunaUser }) {
             <p className="text-sm text-muted-foreground">
               {canPredict
                 ? `Period avg ${p?.avgPeriodLength} days`
+                : insufficient
+                ? "Log one more completed cycle to unlock"
                 : "Based on your history"}
             </p>
           </div>
