@@ -26,6 +26,9 @@ export function SoloHome({ user }: { user: LunaUser }) {
 
   const p = prediction;
   const hasData = !!p?.hasData;
+  const canPredict = !!p?.canPredict;
+  const isOngoing = p?.status === "ongoing";
+  const insufficient = p?.status === "insufficient";
 
   return (
     <div className="flex flex-col gap-5 px-6 pb-28 pt-10">
@@ -47,8 +50,12 @@ export function SoloHome({ user }: { user: LunaUser }) {
               {hasData && p?.currentPhase ? p.currentPhase : "—"}
             </h2>
             <p className="mt-1 text-sm text-white/85">
-              {hasData && p?.currentCycleDay
+              {isOngoing
+                ? "Period Ongoing"
+                : canPredict && p?.currentCycleDay
                 ? `Day ${p.currentCycleDay} of ${p.avgCycleLength}`
+                : insufficient
+                ? "Not enough data for predictions yet"
                 : "Log a period to see your phase"}
             </p>
           </div>
@@ -64,8 +71,12 @@ export function SoloHome({ user }: { user: LunaUser }) {
               {hasData && p?.currentCycleDay ? `Day ${p.currentCycleDay}` : "—"}
             </h3>
             <p className="text-sm text-muted-foreground">
-              {hasData
+              {canPredict
                 ? `Cycle avg ${p?.avgCycleLength} days`
+                : isOngoing
+                ? "Period ongoing"
+                : insufficient
+                ? "Not enough data for predictions yet"
                 : "No cycles logged"}
             </p>
           </div>
@@ -80,15 +91,19 @@ export function SoloHome({ user }: { user: LunaUser }) {
           <div>
             <CardLabel>Next Period</CardLabel>
             <h3 className="mt-1 text-xl font-semibold">
-              {hasData && p?.daysUntilNextPeriod !== null
+              {canPredict && p?.daysUntilNextPeriod !== null && p?.daysUntilNextPeriod !== undefined
                 ? p!.daysUntilNextPeriod >= 0
                   ? `in ${p!.daysUntilNextPeriod} days`
                   : `${Math.abs(p!.daysUntilNextPeriod)} days late`
                 : "—"}
             </h3>
             <p className="text-sm text-muted-foreground">
-              {hasData && p?.nextPeriodDate
+              {canPredict && p?.nextPeriodDate
                 ? `Estimated ${formatPredictionDate(p.nextPeriodDate)}`
+                : isOngoing
+                ? "Available after period ends"
+                : insufficient
+                ? "Not enough data for predictions yet"
                 : "Log a period for predictions"}
             </p>
           </div>
@@ -103,10 +118,10 @@ export function SoloHome({ user }: { user: LunaUser }) {
           <div>
             <CardLabel>Average Cycle</CardLabel>
             <h3 className="mt-1 text-xl font-semibold">
-              {hasData ? `${p?.avgCycleLength} days` : "—"}
+              {canPredict ? `${p?.avgCycleLength} days` : "—"}
             </h3>
             <p className="text-sm text-muted-foreground">
-              {hasData
+              {canPredict
                 ? `Period avg ${p?.avgPeriodLength} days`
                 : "Based on your history"}
             </p>
