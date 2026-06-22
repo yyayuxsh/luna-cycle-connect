@@ -51,30 +51,36 @@ export type Database = {
         Row: {
           account_type: string | null
           avatar_url: string | null
+          connected_since: string | null
           created_at: string
           display_name: string | null
           experience_mode: string | null
           id: string
+          partner_code: string | null
           partner_id: string | null
           updated_at: string
         }
         Insert: {
           account_type?: string | null
           avatar_url?: string | null
+          connected_since?: string | null
           created_at?: string
           display_name?: string | null
           experience_mode?: string | null
           id: string
+          partner_code?: string | null
           partner_id?: string | null
           updated_at?: string
         }
         Update: {
           account_type?: string | null
           avatar_url?: string | null
+          connected_since?: string | null
           created_at?: string
           display_name?: string | null
           experience_mode?: string | null
           id?: string
+          partner_code?: string | null
           partner_id?: string | null
           updated_at?: string
         }
@@ -85,7 +91,30 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
-      [_ in never]: never
+      connect_partner_by_code: {
+        Args: { _code: string }
+        Returns: {
+          account_type: string | null
+          avatar_url: string | null
+          connected_since: string | null
+          created_at: string
+          display_name: string | null
+          experience_mode: string | null
+          id: string
+          partner_code: string | null
+          partner_id: string | null
+          updated_at: string
+        }
+        SetofOptions: {
+          from: "*"
+          to: "profiles"
+          isOneToOne: true
+          isSetofReturn: false
+        }
+      }
+      disconnect_partner: { Args: never; Returns: undefined }
+      generate_partner_code: { Args: never; Returns: string }
+      regenerate_partner_code: { Args: never; Returns: string }
     }
     Enums: {
       [_ in never]: never
