@@ -2,6 +2,7 @@ import { createFileRoute, Navigate, useNavigate } from "@tanstack/react-router";
 import { LogOut, Settings, Shield, User } from "lucide-react";
 import { LunaCard, CardLabel } from "@/components/luna/Card";
 import { signOut, useLunaUser } from "@/lib/luna-store";
+import { PartnerSync } from "@/components/luna/PartnerSync";
 
 export const Route = createFileRoute("/_app/profile")({
   head: () => ({ meta: [{ title: "Profile — Luna" }] }),
@@ -9,7 +10,7 @@ export const Route = createFileRoute("/_app/profile")({
 });
 
 function ProfilePage() {
-  const { user, loading } = useLunaUser();
+  const { user, loading, refresh } = useLunaUser();
   const navigate = useNavigate();
 
   const logout = async () => {
@@ -42,6 +43,15 @@ function ProfilePage() {
           </div>
         </div>
       </LunaCard>
+
+      {user.mode === "couple" && (
+        <section className="flex flex-col gap-3">
+          <h2 className="px-1 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
+            Partner Connection
+          </h2>
+          <PartnerSync user={user} onChange={refresh} />
+        </section>
+      )}
 
       <LunaCard className="p-0 overflow-hidden">
         <Row icon={<User className="h-5 w-5" />} label="Personal information" />
