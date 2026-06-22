@@ -1,6 +1,7 @@
 import { Link, useRouterState } from "@tanstack/react-router";
 import { Home, Calendar, Plus, Heart, User } from "lucide-react";
 import { cn } from "@/lib/utils";
+import { useLunaUser } from "@/lib/luna-store";
 
 type NavItem = {
   to: "/home" | "/cycle" | "/checkin" | "/partner" | "/profile";
@@ -9,7 +10,7 @@ type NavItem = {
   primary?: boolean;
 };
 
-const items: NavItem[] = [
+const womanItems: NavItem[] = [
   { to: "/home", label: "Home", icon: Home },
   { to: "/cycle", label: "Cycle", icon: Calendar },
   { to: "/checkin", label: "Check-In", icon: Plus, primary: true },
@@ -17,11 +18,20 @@ const items: NavItem[] = [
   { to: "/profile", label: "Profile", icon: User },
 ];
 
+const partnerItems: NavItem[] = [
+  { to: "/home", label: "Home", icon: Home },
+  { to: "/partner", label: "Partner", icon: Heart, primary: true },
+  { to: "/profile", label: "Profile", icon: User },
+];
+
 export function BottomNav() {
   const pathname = useRouterState({ select: (s) => s.location.pathname });
+  const { user } = useLunaUser();
+  const items = user?.accountType === "partner" ? partnerItems : womanItems;
+  const cols = items.length === 3 ? "grid-cols-3" : "grid-cols-5";
   return (
     <nav className="sticky bottom-0 left-0 right-0 z-30 border-t border-border bg-background/85 backdrop-blur-xl">
-      <ul className="grid grid-cols-5 px-2 pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-2">
+      <ul className={cn("grid px-2 pb-[max(env(safe-area-inset-bottom),0.5rem)] pt-2", cols)}>
         {items.map((it) => {
           const Icon = it.icon;
           const active = pathname === it.to;
