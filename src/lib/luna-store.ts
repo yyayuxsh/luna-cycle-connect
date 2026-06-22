@@ -15,7 +15,6 @@ export interface LunaUser {
   partnerId?: string | null;
   partnerName?: string | null;
   connectedSince?: string | null;
-  partnerName?: string;
   togetherSince?: string;
 }
 
