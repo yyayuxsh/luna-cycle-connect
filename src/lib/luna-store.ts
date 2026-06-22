@@ -90,6 +90,7 @@ async function loadLunaUser(authUser: User): Promise<LunaUser> {
 export function useLunaUser() {
   const [user, setUser] = useState<LunaUser | null>(null);
   const [loading, setLoading] = useState(true);
+  const [version, setVersion] = useState(0);
 
   useEffect(() => {
     let cancelled = false;
@@ -123,9 +124,9 @@ export function useLunaUser() {
       cancelled = true;
       sub.subscription.unsubscribe();
     };
-  }, []);
+  }, [version]);
 
-  return { user, loading };
+  return { user, loading, refresh: () => setVersion((v) => v + 1) };
 }
 
 export async function signOut() {
