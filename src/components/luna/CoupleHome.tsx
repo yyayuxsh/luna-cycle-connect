@@ -1,13 +1,18 @@
+import { Link } from "@tanstack/react-router";
 import { Heart, CalendarDays, MessageCircleHeart, Droplet } from "lucide-react";
 import { LunaCard, CardLabel } from "./Card";
 import type { LunaUser } from "@/lib/luna-store";
 
 export function CoupleHome({ user }: { user: LunaUser }) {
-  const womanName = user.accountType === "woman" ? user.name : user.partnerName ?? "Sam";
-  const partnerName = user.accountType === "woman" ? user.partnerName ?? "Alex" : user.name;
-  const days = user.togetherSince
-    ? Math.max(1, Math.floor((Date.now() - new Date(user.togetherSince).getTime()) / (1000 * 60 * 60 * 24)))
-    : 412;
+  const connected = !!user.partnerId;
+  const womanName = user.accountType === "woman" ? user.name : user.partnerName ?? "Your partner";
+  const partnerName = user.accountType === "woman" ? user.partnerName ?? "Your partner" : user.name;
+  const days = user.connectedSince
+    ? Math.max(1, Math.floor((Date.now() - new Date(user.connectedSince).getTime()) / (1000 * 60 * 60 * 24)))
+    : 0;
+  const sinceLabel = user.connectedSince
+    ? new Date(user.connectedSince).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })
+    : null;
 
   return (
     <div className="flex flex-col gap-5 px-6 pb-28 pt-10">
@@ -18,6 +23,28 @@ export function CoupleHome({ user }: { user: LunaUser }) {
         </h1>
       </header>
 
+      {!connected ? (
+        <LunaCard tone="rose" className="relative overflow-hidden">
+          <div className="pointer-events-none absolute -right-12 -bottom-12 h-44 w-44 rounded-full bg-white/15 blur-2xl" />
+          <div className="flex items-start gap-3">
+            <Heart className="mt-1 h-6 w-6 text-white" />
+            <div className="flex-1">
+              <h2 className="text-xl font-semibold">Connect With Your Partner</h2>
+              <p className="mt-1 text-sm text-white/90">
+                {user.accountType === "woman"
+                  ? "Share your invite code to start tracking together."
+                  : "Enter your partner's invite code to start tracking together."}
+              </p>
+              <Link
+                to="/partner"
+                className="mt-4 inline-flex items-center gap-2 rounded-xl bg-white px-4 py-2 text-sm font-semibold text-[color:var(--accent-rose)] transition active:scale-95"
+              >
+                {user.accountType === "woman" ? "Generate Code" : "Enter Code"}
+              </Link>
+            </div>
+          </div>
+        </LunaCard>
+      ) : (
       <LunaCard tone="rose" className="relative overflow-hidden">
         <div className="pointer-events-none absolute -right-12 -bottom-12 h-44 w-44 rounded-full bg-white/15 blur-2xl" />
         <div className="flex items-center gap-3">
@@ -28,8 +55,16 @@ export function CoupleHome({ user }: { user: LunaUser }) {
         <h2 className="mt-4 text-2xl font-semibold">
           {womanName} <span className="font-light">&</span> {partnerName}
         </h2>
-        <p className="mt-1 text-sm text-white/90">Together for {days} days</p>
+        <p className="mt-1 text-sm text-white/90">
+          {user.accountType === "woman"
+            ? <>Your partner: {partnerName} ❤️</>
+            : <>Connected with {partnerName} ❤️</>}
+        </p>
+        {sinceLabel && (
+          <p className="mt-1 text-xs text-white/80">Together since {sinceLabel} · {days} days</p>
+        )}
       </LunaCard>
+      )}
 
       <LunaCard tone="primary">
         <CardLabel>
