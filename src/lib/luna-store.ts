@@ -6,10 +6,15 @@ export type AccountType = "woman" | "partner";
 export type ExperienceMode = "solo" | "couple";
 
 export interface LunaUser {
+  id: string;
   name: string;
   email: string;
   accountType: AccountType;
   mode?: ExperienceMode;
+  partnerCode?: string | null;
+  partnerId?: string | null;
+  partnerName?: string | null;
+  connectedSince?: string | null;
   partnerName?: string;
   togetherSince?: string;
 }
@@ -42,12 +47,15 @@ interface ProfileRow {
   account_type: AccountType | null;
   experience_mode: ExperienceMode | null;
   avatar_url: string | null;
+  partner_code: string | null;
+  partner_id: string | null;
+  connected_since: string | null;
 }
 
 async function loadLunaUser(authUser: User): Promise<LunaUser> {
   const { data } = await supabase
     .from("profiles")
-    .select("display_name, account_type, experience_mode, avatar_url")
+    .select("display_name, account_type, experience_mode, avatar_url, partner_code, partner_id, connected_since")
     .eq("id", authUser.id)
     .maybeSingle();
 
@@ -56,11 +64,27 @@ async function loadLunaUser(authUser: User): Promise<LunaUser> {
   const mode: ExperienceMode =
     profile?.experience_mode ?? (accountType === "partner" ? "couple" : "solo");
 
+  let partnerName: string | null = null;
+  if (profile?.partner_id) {
+    const { data: p } = await supabase
+      .from("profiles")
+      .select("display_name")
+      .eq("id", profile.partner_id)
+      .maybeSingle();
+    partnerName = p?.display_name ?? null;
+  }
+
   return {
+    id: authUser.id,
     name: profile?.display_name ?? authUser.email ?? "Luna",
     email: authUser.email ?? "",
     accountType,
     mode,
+    partnerCode: profile?.partner_code ?? null,
+    partnerId: profile?.partner_id ?? null,
+    partnerName,
+    connectedSince: profile?.connected_since ?? null,
+    togetherSince: profile?.connected_since ?? undefined,
   };
 }
 
