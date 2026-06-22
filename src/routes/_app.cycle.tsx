@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Navigate } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { CalendarDays, Droplet, Pencil, Plus, Trash2, X } from "lucide-react";
 import { LunaCard, CardLabel } from "@/components/luna/Card";
@@ -8,6 +8,7 @@ import { Label } from "@/components/ui/label";
 import { toast } from "sonner";
 import { supabase } from "@/integrations/supabase/client";
 import { computePredictions, formatPredictionDate } from "@/lib/cycle-predictions";
+import { useLunaUser } from "@/lib/luna-store";
 
 export const Route = createFileRoute("/_app/cycle")({
   head: () => ({ meta: [{ title: "Cycle — Luna" }] }),
@@ -58,6 +59,7 @@ function PredictionStat({ label, value }: { label: string; value: string }) {
 }
 
 function CyclePage() {
+  const { user, loading: userLoading } = useLunaUser();
   const [cycles, setCycles] = useState<CycleRow[]>([]);
   const [loading, setLoading] = useState(true);
   const [modalOpen, setModalOpen] = useState(false);
@@ -78,8 +80,12 @@ function CyclePage() {
   };
 
   useEffect(() => {
-    load();
-  }, []);
+    if (user && user.accountType !== "partner") load();
+    else setLoading(false);
+  }, [user]);
+
+  if (userLoading) return null;
+  if (user && user.accountType === "partner") return <Navigate to="/home" />;
 
   const sortedAsc = useMemo(
     () => [...cycles].sort((a, b) => a.period_start.localeCompare(b.period_start)),
