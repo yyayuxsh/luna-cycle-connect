@@ -1,18 +1,42 @@
-import { createFileRoute, Outlet } from "@tanstack/react-router";
+import { createFileRoute, Navigate, Outlet, useRouterState } from "@tanstack/react-router";
 import { PhoneFrame } from "@/components/luna/PhoneFrame";
 import { BottomNav } from "@/components/luna/BottomNav";
+import { LunaUserProvider, useLunaUser } from "@/lib/luna-store";
 
 export const Route = createFileRoute("/_app")({
   component: AppLayout,
 });
 
-function AppLayout() {
+// Routes only the woman account may access.
+const WOMAN_ONLY = new Set(["/cycle", "/checkin"]);
+
+function AppGate() {
+  const { user, loading } = useLunaUser();
+  const pathname = useRouterState({ select: (s) => s.location.pathname });
+
+  if (loading) return null;
+  if (!user) return <Navigate to="/" />;
+
+  if (user.accountType === "partner" && WOMAN_ONLY.has(pathname)) {
+    return <Navigate to="/home" />;
+  }
+
   return (
-    <PhoneFrame background="default">
+    <>
       <div className="flex flex-1 flex-col overflow-y-auto">
         <Outlet />
       </div>
       <BottomNav />
-    </PhoneFrame>
+    </>
+  );
+}
+
+function AppLayout() {
+  return (
+    <LunaUserProvider>
+      <PhoneFrame background="default">
+        <AppGate />
+      </PhoneFrame>
+    </LunaUserProvider>
   );
 }

@@ -35,16 +35,18 @@ function ProfilePage() {
           </div>
           <div>
             <h2 className="text-xl font-semibold">{user.name}</h2>
-            <p className="text-sm text-white/85">{user.email}</p>
-            <p className="mt-1 text-xs uppercase tracking-wider text-white/75">
-              {user.mode === "couple" ? "❤️ Couple Mode" : "🌙 Solo Mode"} ·{" "}
-              {user.accountType === "woman" ? "Woman" : "Partner"}
+            <p className="mt-1 text-xs uppercase tracking-wider text-white/85">
+              {user.accountType === "partner"
+                ? "❤️ Partner Mode"
+                : user.mode === "couple"
+                  ? "❤️ Couple Mode · Woman"
+                  : "🌙 Solo Mode · Woman"}
             </p>
           </div>
         </div>
       </LunaCard>
 
-      {user.mode === "couple" && (
+      {(user.mode === "couple" || user.accountType === "partner") && (
         <section className="flex flex-col gap-3">
           <h2 className="px-1 text-sm font-semibold uppercase tracking-wider text-muted-foreground">
             Partner Connection
