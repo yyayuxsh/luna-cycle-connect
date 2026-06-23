@@ -1,4 +1,5 @@
-import { useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState, type ReactNode } from "react";
+import { createElement } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import type { User } from "@supabase/supabase-js";
 
@@ -87,7 +88,15 @@ async function loadLunaUser(authUser: User): Promise<LunaUser> {
   };
 }
 
-export function useLunaUser() {
+interface LunaUserContextValue {
+  user: LunaUser | null;
+  loading: boolean;
+  refresh: () => void;
+}
+
+const LunaUserContext = createContext<LunaUserContextValue | null>(null);
+
+function useLunaUserState(): LunaUserContextValue {
   const [user, setUser] = useState<LunaUser | null>(null);
   const [loading, setLoading] = useState(true);
   const [version, setVersion] = useState(0);
@@ -127,6 +136,18 @@ export function useLunaUser() {
   }, [version]);
 
   return { user, loading, refresh: () => setVersion((v) => v + 1) };
+}
+
+export function LunaUserProvider({ children }: { children: ReactNode }) {
+  const value = useLunaUserState();
+  return createElement(LunaUserContext.Provider, { value }, children);
+}
+
+export function useLunaUser(): LunaUserContextValue {
+  const ctx = useContext(LunaUserContext);
+  if (ctx) return ctx;
+  // Fallback for screens outside the provider (auth pages). Spins up a local copy.
+  return useLunaUserState();
 }
 
 export async function signOut() {
