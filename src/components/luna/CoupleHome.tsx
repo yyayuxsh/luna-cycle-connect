@@ -1,7 +1,15 @@
+import { useEffect, useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Heart, CalendarDays, MessageCircleHeart, Droplet } from "lucide-react";
 import { LunaCard, CardLabel } from "./Card";
 import type { LunaUser } from "@/lib/luna-store";
+import { supabase } from "@/integrations/supabase/client";
+import {
+  computePredictions,
+  formatPredictionDate,
+  type CyclePrediction,
+  type CycleRow,
+} from "@/lib/cycle-predictions";
 
 export function CoupleHome({ user }: { user: LunaUser }) {
   const connected = !!user.partnerId;
@@ -13,6 +21,17 @@ export function CoupleHome({ user }: { user: LunaUser }) {
   const sinceLabel = user.connectedSince
     ? new Date(user.connectedSince).toLocaleDateString(undefined, { year: "numeric", month: "long", day: "numeric" })
     : null;
+
+  const [prediction, setPrediction] = useState<CyclePrediction | null>(null);
+  useEffect(() => {
+    (async () => {
+      const { data } = await supabase
+        .from("cycles")
+        .select("*")
+        .order("period_start", { ascending: false });
+      setPrediction(computePredictions((data ?? []) as CycleRow[]));
+    })();
+  }, []);
 
   return (
     <div className="flex flex-col gap-5 px-6 pb-28 pt-10">
@@ -72,41 +91,62 @@ export function CoupleHome({ user }: { user: LunaUser }) {
         </CardLabel>
         <div className="mt-2 flex items-end justify-between">
           <div>
-            <h2 className="text-2xl font-semibold">Luteal</h2>
-            <p className="mt-1 text-sm text-white/85">Day 22 · Be extra gentle today</p>
+            <h2 className="text-2xl font-semibold">
+              {prediction?.currentPhase ??
+                (prediction?.status === "ongoing" ? "Menstrual" : "—")}
+            </h2>
+            <p className="mt-1 text-sm text-white/85">
+              {prediction?.currentCycleDay
+                ? `Day ${prediction.currentCycleDay}`
+                : "Log a period to see your phase"}
+              {prediction?.status === "ongoing" && " · Period ongoing"}
+            </p>
           </div>
           <Droplet className="h-9 w-9 text-white/80" />
         </div>
       </LunaCard>
 
-      <LunaCard>
-        <div className="flex items-center justify-between">
-          <div>
-            <CardLabel>Next Period</CardLabel>
-            <h3 className="mt-1 text-xl font-semibold">in 6 days</h3>
-            <p className="text-sm text-muted-foreground">A bit of patience goes a long way 💜</p>
+      {prediction?.canPredict && prediction.nextPeriodDate && (
+        <LunaCard>
+          <div className="flex items-center justify-between">
+            <div>
+              <CardLabel>Next Period</CardLabel>
+              <h3 className="mt-1 text-xl font-semibold">
+                {prediction.daysUntilNextPeriod !== null &&
+                prediction.daysUntilNextPeriod >= 0
+                  ? `in ${prediction.daysUntilNextPeriod} days`
+                  : formatPredictionDate(prediction.nextPeriodDate)}
+              </h3>
+              <p className="text-sm text-muted-foreground">
+                Estimated {formatPredictionDate(prediction.nextPeriodDate)}
+              </p>
+            </div>
+            <div className="grid h-12 w-12 place-items-center rounded-2xl bg-primary/10 text-primary">
+              <CalendarDays className="h-6 w-6" />
+            </div>
           </div>
-          <div className="grid h-12 w-12 place-items-center rounded-2xl bg-primary/10 text-primary">
-            <CalendarDays className="h-6 w-6" />
-          </div>
-        </div>
-      </LunaCard>
+        </LunaCard>
+      )}
 
-      <LunaCard>
-        <div className="flex items-start gap-3">
-          <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[color:var(--accent-rose)]/10 text-[color:var(--accent-rose)]">
-            <MessageCircleHeart className="h-6 w-6" />
+      {connected && (
+        <LunaCard>
+          <div className="flex items-start gap-3">
+            <div className="grid h-12 w-12 shrink-0 place-items-center rounded-2xl bg-[color:var(--accent-rose)]/10 text-[color:var(--accent-rose)]">
+              <MessageCircleHeart className="h-6 w-6" />
+            </div>
+            <div>
+              <CardLabel>Partner Insights</CardLabel>
+              <h3 className="mt-1 text-lg font-semibold">
+                You and {partnerName} are in sync ❤️
+              </h3>
+              <p className="mt-1 text-sm text-muted-foreground">
+                {partnerName} can see your current phase and upcoming period
+                from their app.
+              </p>
+            </div>
           </div>
-          <div>
-            <CardLabel>Partner Insights</CardLabel>
-            <h3 className="mt-1 text-lg font-semibold">Suggest a quiet night in</h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              {womanName} may have lower energy this week. A warm meal and a movie
-              would mean a lot.
-            </p>
-          </div>
-        </div>
-      </LunaCard>
+        </LunaCard>
+      )}
     </div>
   );
 }
