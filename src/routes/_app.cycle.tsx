@@ -18,8 +18,8 @@ export const Route = createFileRoute("/_app/cycle")({
 type CycleRow = {
   id: string;
   user_id: string;
-  period_start: string;
-  period_end: string | null;
+  start_date: string;
+  end_date: string | null;
   cycle_length: number | null;
   period_length: number | null;
   created_at: string;
@@ -70,7 +70,7 @@ function CyclePage() {
     const { data, error } = await supabase
       .from("cycles")
       .select("*")
-      .order("period_start", { ascending: false });
+      .order("start_date", { ascending: false });
     if (error) {
       toast.error(error.message);
     } else {
@@ -88,7 +88,7 @@ function CyclePage() {
   if (user && user.accountType === "partner") return <Navigate to="/home" />;
 
   const sortedAsc = useMemo(
-    () => [...cycles].sort((a, b) => a.period_start.localeCompare(b.period_start)),
+    () => [...cycles].sort((a, b) => a.start_date.localeCompare(b.start_date)),
     [cycles],
   );
 
@@ -132,10 +132,10 @@ function CyclePage() {
         {current ? (
           <div className="mt-2">
             <h2 className="text-2xl font-semibold">
-              Started {formatDate(current.period_start)}
+              Started {formatDate(current.start_date)}
             </h2>
             <p className="mt-1 text-sm text-white/85">
-              {current.period_end
+              {current.end_date
                 ? `Period: ${current.period_length ?? "—"} days`
                 : "Period ongoing"}
               {avgCycleLength ? ` · Avg cycle: ${avgCycleLength} days` : ""}
@@ -251,8 +251,8 @@ function CyclePage() {
                     </div>
                     <div>
                       <h3 className="font-semibold leading-tight">
-                        {formatDate(c.period_start)}
-                        {c.period_end ? ` → ${formatDate(c.period_end)}` : ""}
+                        {formatDate(c.start_date)}
+                        {c.end_date ? ` → ${formatDate(c.end_date)}` : ""}
                       </h3>
                       <p className="mt-0.5 text-xs text-muted-foreground">
                         {c.period_length
@@ -311,8 +311,8 @@ function LogPeriodModal({
   onClose: () => void;
   onSaved: () => void;
 }) {
-  const [start, setStart] = useState(existing?.period_start ?? todayISO());
-  const [end, setEnd] = useState(existing?.period_end ?? "");
+  const [start, setStart] = useState(existing?.start_date ?? todayISO());
+  const [end, setEnd] = useState(existing?.end_date ?? "");
   const [saving, setSaving] = useState(false);
 
   const save = async () => {
@@ -327,13 +327,13 @@ function LogPeriodModal({
     // and for this cycle relative to the next-later one (if editing in the middle).
     const others = allCycles.filter((c) => c.id !== existing?.id);
     const prev = others
-      .filter((c) => c.period_start < start)
-      .sort((a, b) => b.period_start.localeCompare(a.period_start))[0];
+      .filter((c) => c.start_date < start)
+      .sort((a, b) => b.start_date.localeCompare(a.start_date))[0];
     const next = others
-      .filter((c) => c.period_start > start)
-      .sort((a, b) => a.period_start.localeCompare(b.period_start))[0];
+      .filter((c) => c.start_date > start)
+      .sort((a, b) => a.start_date.localeCompare(b.start_date))[0];
 
-    const cycle_length = next ? diffDays(start, next.period_start) : null;
+    const cycle_length = next ? diffDays(start, next.start_date) : null;
 
     const { data: auth } = await supabase.auth.getUser();
     if (!auth.user) {
@@ -346,8 +346,8 @@ function LogPeriodModal({
       ({ error } = await supabase
         .from("cycles")
         .update({
-          period_start: start,
-          period_end: end || null,
+          start_date: start,
+          end_date: end || null,
           period_length,
           cycle_length,
         })
@@ -355,8 +355,8 @@ function LogPeriodModal({
     } else {
       ({ error } = await supabase.from("cycles").insert({
         user_id: auth.user.id,
-        period_start: start,
-        period_end: end || null,
+        start_date: start,
+        end_date: end || null,
         period_length,
         cycle_length,
       }));
@@ -371,7 +371,7 @@ function LogPeriodModal({
     if (prev) {
       await supabase
         .from("cycles")
-        .update({ cycle_length: diffDays(prev.period_start, start) })
+        .update({ cycle_length: diffDays(prev.start_date, start) })
         .eq("id", prev.id);
     }
 
